@@ -8,28 +8,22 @@ import numpy as np
 current_date = np.datetime64('today')
 
 
-def simulation(time, h, number_of_astroids,extra_name=""):
+def simulation(time, h, number_of_astroids, save=False, extra_name=""):
     '''This function uses the Euler-Cromer method to solve N times 3-body problems.'''
-
-    a_pos = open(str(extra_name) + "_date_" + str(current_date) +  "_astroid_positions_m=1_abound=3.3_3.4_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
-    a_vel = open(str(extra_name) + "_date_" + str(current_date) +  "_astroid_velocities_m=1_abound=3.3_3.4_time_"+str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
-    j_pos = open(str(extra_name) + "_date_" + str(current_date) +  "_jupiter_positions_m=1_abound=3.3_3.4_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
-    j_vel = open(str(extra_name) + "_date_" + str(current_date) +  "_jupiter_velocities_m=1_abound=3.3_3.4_time_"+str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
-    d_astroid = open(str(extra_name) + "_date_" + str(current_date) +  "_distance_astroids_m=1_abound=3.3_3.4_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
 
     '''%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'''
     '''%%% creation and initialization of jupiter and astroids '''
     '''%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'''
 
     '''jupiter, take sun = (0,0,0) '''
-    jupiter = np.array([[ [0.0,ps.a*(1.-ps.e),0.0] , [-np.sqrt((ps.G/ps.a) * (1.+ps.e)/(1-ps.e)),0.0,0.0] ]])
+    jupiter = np.array([[ [0.0,ps.a*(1.-ps.e),0.0] , [-np.sqrt( (ps.G/ps.a) * (1.+ps.e)/(1-ps.e) ),0.0,0.0] ]])
 
     '''create multidimensional array for all astroids'''
     astroids = np.zeros((number_of_astroids, 2, 3)) # nr astr., pos. and vel. vector, spatial dimension
 
     '''array for radius and angle for starting position'''
-    radius0 = np.random.uniform(2.4, 3.4, (number_of_astroids))
-    theta0  = np.random.uniform(0.0, 2*np.pi, (number_of_astroids))
+    radius0 = np.random.uniform(2.0, 3.5, number_of_astroids)
+    theta0  = np.random.uniform(0.0, 2*np.pi, number_of_astroids)
 
     '''x = r cos theta'''
     astroids[:,0][:,0] = radius0*np.cos(theta0)
@@ -40,13 +34,14 @@ def simulation(time, h, number_of_astroids,extra_name=""):
     '''z = small'''
     astroids[:,0][:,2] = 1/100*radius0*np.sin(theta0)
 
+
     '''vx and vy are random '''
-    astroids[:,1][:,0] = np.random.uniform(-1e-2, 1e-2, (number_of_astroids))
-#-np.sqrt(G/radius0 *(1.+e)/(1-e)) * np.sin(theta0)
-    astroids[:,1][:,1] =  np.random.uniform(-1e-2, 1e-2, (number_of_astroids))
+    astroids[:,1][:,0] = + radius0 * np.sin(theta0)
+
+    astroids[:,1][:,1] = - radius0 * np.cos(theta0)
 
     '''vz = small'''
-    astroids[:,1][:,2] = 0.01 * np.random.uniform(-1e-2, 1e-2, (number_of_astroids))
+    astroids[:,1][:,2] = np.random.uniform(-1e-4, 1e-4, (number_of_astroids))
 
 
     '''%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'''
@@ -91,16 +86,11 @@ def simulation(time, h, number_of_astroids,extra_name=""):
         bound_astroids = np.logical_and( d_sun_ast[:,0] > 1.7,  d_sun_ast[:,0] < 4.0 )
         astroids = astroids[bound_astroids]
 
+    if save:
+        np.savez(str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids),\
+         a_pos=astroids[:,0], a_vel=astroids[:,1], j_pos=jupiter[:,0], j_vel=jupiter[:,1], d_astroid=d_sun_ast)
 
-        '''saves data every 100000 timesteps.'''
-        if t %  100000 == 0:
-            np.savetxt(a_pos,astroids[:,0])
-            np.savetxt(a_vel,astroids[:,1])
-            np.savetxt(j_pos,jupiter[:,0])
-            np.savetxt(j_vel,jupiter[:,1])
-            np.savetxt(d_astroid, d_sun_ast)
-
-    print ("astroids left" + str(bound_astroids.shape))
+    print ("astroids left", np.sum(bound_astroids))
 
     return jupiter, astroids
 

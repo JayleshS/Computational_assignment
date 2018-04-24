@@ -23,7 +23,7 @@ current_date = np.datetime64('today')
 
 def load_files(time, h, number_of_astroids, extra_name=""):
 
-    a_pos = np.loadhoihoihoitxt(str(extra_name) + "_date_" + str(current_date) + "_astroid_positions_m=1_abound=3.3_3.4_time_"  +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
+    a_pos = np.loadtxt(str(extra_name) + "_date_" + str(current_date) + "_astroid_positions_m=1_abound=3.3_3.4_time_"  +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
     a_vel = np.loadtxt(str(extra_name) + "_date_" + str(current_date) + "_astroid_velocities_m=1_abound=3.3_3.4_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
     j_pos = np.loadtxt(str(extra_name) + "_date_" + str(current_date) + "_jupiter_positions_m=1_abound=3.3_3.4_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
     j_vel = np.loadtxt(str(extra_name) + "_date_" + str(current_date) + "_jupiter_velocities_m=1_abound=3.3_3.4_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
@@ -35,13 +35,13 @@ def load_files(time, h, number_of_astroids, extra_name=""):
 
 
 
-total_years = 0.5
+total_years = 10
 timestep = 0.5/365.25
 number_of_astroids = 10000
 
-jupiter, astroids = fn.simulation(total_years, timestep, number_of_astroids, extra_name='troep')
+jupiter, astroids = fn.simulation(total_years, timestep, number_of_astroids)
 # a_pos, a_vel, j_pos, j_vel, distance_astroid = load_files(total_years, timestep, number_of_astroids, extra_name='troep')
-
+# print (a_pos)
 
 
 #convergence_test(10,0.01)
