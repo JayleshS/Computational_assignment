@@ -81,7 +81,7 @@ def simulation(time, h, number_of_astroids, save=False, extra_name=""):
                            + (-ps.G*ps.M_jup/(d_jup_ast**3) * (astroids[:,0] - jupiter[:,0]) ) )
         astroids[:,0] += h * astroids[:,1]
 
-
+        # if t%10000 ==0:
         '''delete diverging astroids'''
         bound_astroids = np.logical_and( d_sun_ast[:,0] > 1.7,  d_sun_ast[:,0] < 4.0 )
         astroids = astroids[bound_astroids]
