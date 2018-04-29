@@ -4,9 +4,7 @@ from __future__ import print_function
 import pars as ps
 import numpy as np
 
-
 current_date = np.datetime64('today')
-
 
 def simulation(time, h, number_of_astroids, save=False, extra_name=""):
     '''This function uses the Euler-Cromer method to solve N times 3-body problems.'''
@@ -43,13 +41,17 @@ def simulation(time, h, number_of_astroids, save=False, extra_name=""):
     '''vz = small'''
     astroids[:,1][:,2] = np.random.uniform(-1e-4, 1e-4, (number_of_astroids))
 
-
     '''%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'''
     '''%%% time for loop '''
     '''%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'''
 
     n = int(time/h) #number of timesteps
+    print("number of timesteps: " + str(n))
     for t in range(n-1):
+
+        if t % 10000 == 0 :
+            '''prints current timestep, number of total timesteps and current year'''
+            print("simulation reached time step " + str(t) + " of " + str(n) + ". Year = " + str(t*h))
 
         '''distance sun to jupiter'''
         d_sun_jup = np.sqrt(  jupiter[:,0][:,0]**2
@@ -94,9 +96,6 @@ def simulation(time, h, number_of_astroids, save=False, extra_name=""):
 
     return jupiter, astroids
 
-
-
-
 def convergence_test(time, h):
     '''This function is to investigate the error convergence of the Euler-Cromer method for a 3 planet system. However, it does not work correctly.'''
 
@@ -110,7 +109,6 @@ def convergence_test(time, h):
     fig, axes = plt.subplots(nrows=1, ncols=1)
     w, h = fig.get_size_inches()
     fig.set_size_inches(1.2 * w, 2.4* h)
-
 
     planet_one   = np.array([[ [np.cos(  np.pi/3),np.sin(  np.pi/3),0.0] , [-np.sin(  np.pi/3),np.cos(  np.pi/3),0.0] ]])
     planet_two   = np.array([[ [np.cos(2*np.pi/3),np.sin(2*np.pi/3),0.0] , [-np.sin(2*np.pi/3),np.cos(2*np.pi/3),0.0] ]])
