@@ -3,8 +3,13 @@ from __future__ import division
 from __future__ import print_function
 import pars as ps
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 current_date = np.datetime64('today')
+c1= '#66c2a5'
+c2= '#fc8d62'
+c3= '#8da0cb'
 
 def simulation(time, h, number_of_astroids, save=False, extra_name=""):
     '''This function uses the Euler-Cromer method to solve N times 3-body problems.'''
@@ -96,65 +101,72 @@ def simulation(time, h, number_of_astroids, save=False, extra_name=""):
 
     return jupiter, astroids
 
-def convergence_test(time, h):
+
+def convergence_test(time, h, save=False, extra_name=''):
     '''This function is to investigate the error convergence of the Euler-Cromer method for a 3 planet system. However, it does not work correctly.'''
 
-    planet_one_pos = open("planet_one_positions_time_" +str(time)+"_h_"+str(h)+".dat", "a")
-    planet_one_vel = open("planet_one_velocities_time_"+str(time)+"_h_"+str(h)+".dat", "a")
-    planet_two_pos = open("planet_two_positions_time_" +str(time)+"_h_"+str(h)+".dat", "a")
-    planet_two_vel = open("planet_two_velocities_time_"+str(time)+"_h_"+str(h)+".dat", "a")
-    planet_three_pos = open("planet_three_positions_time_" +str(time)+"_h_"+str(h)+".dat", "a")
-    planet_three_vel = open("planet_three_velocities_time_"+str(time)+"_h_"+str(h)+".dat", "a")
-    distance_planets = open("distance_planets_time_" +str(time)+"_h_"+str(h)+".dat", "a")
-    fig, axes = plt.subplots(nrows=1, ncols=1)
-    w, h = fig.get_size_inches()
-    fig.set_size_inches(1.2 * w, 2.4* h)
+    p_1_pos = open("p_1_positions_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
+    p_2_pos = open("p_2_positions_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
+    p_3_pos = open("p_3_positions_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
+    # p_1_vel = open("p_1_velocities_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
+    # p_2_vel = open("p_2_velocities_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
+    # p_3_vel = open("p_3_velocities__"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
+    # distance_planets = open("distance_planets_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
 
-    planet_one   = np.array([[ [np.cos(  np.pi/3),np.sin(  np.pi/3),0.0] , [-np.sin(  np.pi/3),np.cos(  np.pi/3),0.0] ]])
-    planet_two   = np.array([[ [np.cos(2*np.pi/3),np.sin(2*np.pi/3),0.0] , [-np.sin(2*np.pi/3),np.cos(2*np.pi/3),0.0] ]])
-    planet_three = np.array([[ [np.cos(  np.pi  ),np.sin(  np.pi  ),0.0] , [-np.sin(  np.pi  ),np.cos(  np.pi  ),0.0] ]])
+    p_1   = np.array([[ [np.cos(2*np.pi/3),np.sin(2*np.pi/3),0.0] , [-np.sin(2*np.pi/3),np.cos(2*np.pi/3),0.0] ]]) * ps.a
+    p_2   = np.array([[ [np.cos(4*np.pi/3),np.sin(4*np.pi/3),0.0] , [-np.sin(4*np.pi/3),np.cos(4*np.pi/3),0.0] ]]) * ps.a
+    p_3   = np.array([[ [np.cos(2*np.pi  ),np.sin(2*np.pi  ),0.0] , [-np.sin(2*np.pi  ),np.cos(2*np.pi  ),0.0] ]]) * ps.a
+
+
 
     n = int(time/h) #number of timesteps
     for t in range(n-1):
         '''calculate the distances between the three planets'''
 
-        d_one_two = np.sqrt(    (planet_one[:,0][:,0]-planet_two[:,0][:,0])**2
-                              + (planet_one[:,0][:,1]-planet_two[:,0][:,1])**2
-                              + (planet_one[:,0][:,2]-planet_two[:,0][:,2])**2
+        d_one_two = np.sqrt(    ( p_1[:,0][:,0] - p_2[:,0][:,0] )**2
+                              + ( p_1[:,0][:,1] - p_2[:,0][:,1] )**2
+                              + ( p_1[:,0][:,2] - p_2[:,0][:,2] )**2
                               )[:,None]
 
-        d_one_three = np.sqrt(  (planet_one[:,0][:,0]-planet_three[:,0][:,0])**2
-                              + (planet_one[:,0][:,1]-planet_three[:,0][:,1])**2
-                              + (planet_one[:,0][:,2]-planet_three[:,0][:,2])**2
+        d_one_three = np.sqrt(  ( p_1[:,0][:,0] - p_3[:,0][:,0] )**2
+                              + ( p_1[:,0][:,1] - p_3[:,0][:,1] )**2
+                              + ( p_1[:,0][:,2] - p_3[:,0][:,2] )**2
                               )[:,None]
 
-        d_two_three = np.sqrt(  (planet_two[:,0][:,0]-planet_three[:,0][:,0])**2
-                              + (planet_two[:,0][:,1]-planet_three[:,0][:,1])**2
-                              + (planet_two[:,0][:,2]-planet_three[:,0][:,2])**2
+        d_two_three = np.sqrt(  ( p_2[:,0][:,0] - p_3[:,0][:,0] )**2
+                              + ( p_2[:,0][:,1] - p_3[:,0][:,1] )**2
+                              + ( p_2[:,0][:,2] - p_3[:,0][:,2] )**2
                               )[:,None]
 
         ''' calculate the evolution of the planets through time'''
 
-        planet_one[:,1]   += h * (-2*ps.G/(d_one_two**3) * (planet_one[:,0]-planet_two[:,0]))
-        + h * (-2*G/(d_one_three**3) * (planet_one[:,0]-planet_three[:,0]))
-        planet_one[:,0]   += h * planet_one[:,1]
+        p_1[:,1]   += h * ( -ps.G/(d_one_two**3) * (p_2[:,0]-p_1[:,0]) ) + h * ( -ps.G/(d_one_three**3) * (p_1[:,0]-p_3[:,0]) )
+        p_1[:,0]   += h * p_1[:,1]
 
-        planet_two[:,1]   += h * (-2*ps.G/(d_one_two**3) * (planet_two[:,0]-planet_one[:,0]))
-        + h * (-2*G/(d_two_three**3) * (planet_two[:,0]-planet_three[:,0]))
-        planet_two[:,0]   += h * planet_two[:,1]
+        p_2[:,1]   += h * ( -ps.G/(d_one_two**3) * (p_2[:,0]-p_1[:,0]) ) + h * ( -ps.G/(d_two_three**3) * (p_3[:,0]-p_2[:,0]) )
+        p_2[:,0]   += h * p_2[:,1]
 
-        planet_three[:,1] += h * (-2*ps.G/(d_one_three**3) * (planet_three[:,0] - planet_one[:,0]))
-        + h * (-2*G/(d_two_three**3) * (planet_three[:,0] - planet_two[:,0]))
-        planet_three[:,0] += h * planet_three[:,1]
+        p_3[:,1] += h * (-ps.G/(d_one_three**3) * (p_1[:,0] - p_3[:,0])) + h * ( -ps.G/(d_two_three**3) * (p_3[:,0]-p_2[:,0]) )
+        p_3[:,0] += h * p_3[:,1]
 
         '''saves data every 100000 timesteps.'''
-        if t < 1000000:
-            np.savetxt(planet_one_pos,planet_one[:,0])
-            np.savetxt(planet_two_pos,planet_two[:,0])
-            np.savetxt(planet_three_pos,planet_three[:,0])
-            np.savetxt(planet_one_vel,planet_one[:,1])
-            np.savetxt(planet_two_vel,planet_two[:,1])
-            np.savetxt(planet_three_vel,planet_three[:,1])
-            np.savetxt(distance_planets, distance_planets)
 
-    return planet_one, planet_two, planet_three, distance_planets
+        plt.plot( p_1[:,0], p_1[:,1], 'r-', label="planet 1")
+        plt.plot( p_2[:,0], p_2[:,1], 's', label="planet 2", c=c2)
+        plt.plot( p_3[:,0], p_3[:,1], '^', label="planet 3", c=c3)
+
+        if save:
+            # np.savez(str(extra_name) + "_date_" + str(current_date) +  "_convergence_time_" +str(time)+"_h_"+str(h),\
+            #  p_1_pos=p_1[:,0], p_1_vel=p_1[:,1], p_2_pos=p_2[:,0], p_2_vel=p_2[:,1], p_3_pos=p_3[:,0], p_3_vel=p_3[:,1])
+            np.savetxt(p_1_pos,p_1[:,0], fmt='%1.4e')
+            np.savetxt(p_2_pos,p_2[:,0], fmt='%1.4e')
+            np.savetxt(p_3_pos,p_3[:,0], fmt='%1.4e')
+        # np.savetxt(p_1_vel,p_1[:,1])
+        # np.savetxt(p_2_vel,p_2[:,1])
+        # np.savetxt(p_3_vel,p_3[:,1])
+        # np.savetxt(distance_planets, distance_planets)
+    # plt.axis('equal')
+
+
+    plt.show()
+    return p_1[:,0], p_2[:,0], p_3[:,0]#, distance_planets

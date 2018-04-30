@@ -7,10 +7,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-mpl.rcParams['axes.linewidth']  = 2
-plt.rcParams['lines.linewidth'] = 2  # Create thicker lines in plots
-plt.rcParams['xtick.labelsize'] = 12
-plt.rcParams['ytick.labelsize'] = 12
+
+# mpl.rcdefaults()
+mpl.rcParams.update(mpl.rcParamsDefault)
+
+
+# mpl.rcParams['axes.linewidth']  = 2
+# plt.rcParams['lines.linewidth'] = 2  # Create thicker lines in plots
+#
+# plt.rcParams['xtick.labelsize'] = 12
+# plt.rcParams['ytick.labelsize'] = 12
 
 current_date = np.datetime64('today')
 c1= '#66c2a5'
@@ -63,23 +69,51 @@ def plot_histo(all_info, nbins = 100) :
 
     plt.show()
 
+def plot_convergence(p_1,p_2,p_3, zoom=3):
+
+    plt.plot( p_1[:,0], p_1[:,1], '-', label="planet 1", c=c1)
+    plt.plot( p_2[:,0], p_2[:,1], 's', label="planet 2", c=c2)
+    plt.plot( p_3[:,0], p_3[:,1], '^', label="planet 3", c=c3)
+
+    plt.set_xlabel("x$_{position}$ [AU]", fontsize=20)
+    plt.set_ylabel("y$_{position}$ [AU]", fontsize=20)
+    plt.set_xlim(-zoom, zoom)
+    plt.set_ylim(-zoom, zoom)
+
+    plt.legend(prop={'size': 15},markerscale=1,fancybox=True,loc=2)
+    plt.tight_layout()
+    axes.axis('equal')
+    plt.show()
+
 def load_files(time, h, number_of_astroids, extra_name=""):
     # all_info = np.load(str(extra_name) + "_date_2018-04-27_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".npz")
     all_info = np.load(str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".npz")
 
     return all_info
 
+def load_convergence_file(time,h,extra_name=''):
+    p_1 = np.loadtxt("p_1_positions_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
+    p_2 = np.loadtxt("p_2_positions_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
+    p_3 = np.loadtxt("p_3_positions_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
+
+    return p_1, p_2, p_3
+
+
 '''choose total runtime, time stepsize and number of asteroids'''
 total_years = 500
 timestep = 0.5/365.25
 number_of_astroids = 1000
 
-'''perform the simulation '''
-jupiter, astroids = fn.simulation(total_years, timestep, number_of_astroids, save=True)
+# '''perform the simulation '''
+# jupiter, astroids = fn.simulation(total_years, timestep, number_of_astroids, save=True)
+#
+# ''' load data and plot results'''
+# # all_info = load_files(total_years, timestep, number_of_astroids)
+# # plot(all_info)
+# # plot_histo(all_info, nbins = 100)
 
-''' load data and plot results'''
-all_info = load_files(total_years, timestep, number_of_astroids)
-plot(all_info)
-plot_histo(all_info, nbins = 100)
+p_1,p_2,p_3 = fn.convergence_test(3, 1e-3,save=False)
 
-print(" ====> end of code was reached <==== ")
+# p_1,p_2,p_3 = load_convergence_file(1e-1,1e-3)
+
+# plot_convergence(p_1,p_2,p_3)
