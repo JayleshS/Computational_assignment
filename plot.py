@@ -9,7 +9,7 @@ import matplotlib as mpl
 
 
 # mpl.rcdefaults()
-mpl.rcParams.update(mpl.rcParamsDefault)
+# mpl.rcParams.update(mpl.rcParamsDefault)
 
 
 # mpl.rcParams['axes.linewidth']  = 2
@@ -23,16 +23,23 @@ c1= '#66c2a5'
 c2= '#fc8d62'
 c3= '#8da0cb'
 
-def plot(all_info, zoom = 6):
-    '''This function is an aid to plot the astroids, Jupiter and the stationary Sun as calulated by the simulation function.'''
+def plot(all_info, zoom = 6, save=''):
+    '''This function is an aid to plot the astroids, Jupiter and the stationary Sun as calulated by the simulation function.
+    Depending on the method used to save the data the plot is generated in two different ways.'''
 
     fig, (axes)= plt.subplots(nrows=1, ncols=1)
     w, h = fig.get_size_inches()
     fig.set_size_inches(1.2 * w, 2.* h)
 
-    axes.scatter(0.0 , 0.0, s= 80, label="Sun",c=c2)
-    axes.scatter((all_info['j_pos'][:,0]), (all_info['j_pos'][:,1]), s=20, label="Jupiter",c=c3)
-    axes.scatter((all_info['a_pos'][:,0]), (all_info['a_pos'][:,1]), s=5, label="Astroids", c=c1)
+    if save == 'np':
+        axes.scatter(0.0 , 0.0, s= 80, label="Sun",c=c2)
+        axes.scatter((all_info['j_pos'][:,0]), (all_info['j_pos'][:,1]), s=20, label="Jupiter",c=c3)
+        axes.scatter((all_info['a_pos'][:,0]), (all_info['a_pos'][:,1]), s=5, label="Astroids", c=c1)
+
+    else:
+        plt.scatter((all_info[:,0]), (all_info[:,1]), label="astroids",c=c1)
+        plt.scatter((all_info[:,0][-300*100:]), (all_info[:,1][-300*100:]), label="Last year of Astroids",c=c2)
+
 
     axes.set_xlabel("x$_{position}$ [AU]", fontsize=20)
     axes.set_ylabel("y$_{position}$ [AU]", fontsize=20)
@@ -45,14 +52,19 @@ def plot(all_info, zoom = 6):
 
     plt.show()
 
-def plot_histo(all_info, nbins = 100) :
-    ''' plot function for histogram '''
+def plot_histo(all_info, nbins = 100, save='') :
+    '''Plot function for histogram
+    Depending on the method used to save the data the plot is generated in two different ways.'''
 
     fig, (axes)= plt.subplots(nrows=1, ncols=1)
     w, h = fig.get_size_inches()
     fig.set_size_inches(1.2 * w, 2.* h)
 
-    axes.hist(all_info['d_astroid'], bins=nbins, label=str(nbins)+" bins", color = c1)
+    if save == 'np':
+        axes.hist(all_info['d_astroid'], bins=nbins, label=str(nbins)+" bins", color = c1)
+    else:
+        axes.hist(np.sqrt((all_info[:,0])**2 + (all_info[:,1])**2), bins=nbins, label=str(nbins)+" bins", color = c1)
+
     axes.set_xlabel("Radial distance to Sun [AU]", fontsize=20)
     axes.set_ylabel("Number of asteroids", fontsize=20)
 
@@ -64,6 +76,7 @@ def plot_histo(all_info, nbins = 100) :
     axes.text(2.81  ,12.0,'5:2', fontsize=15)
     axes.text(2.961 ,12.0,'7:3', fontsize=15)
     axes.text(3.385 ,12.0,'2:1', fontsize=15)
+    # axes.set_yscale('Log')
 
     plt.tight_layout()
 
@@ -86,10 +99,11 @@ def plot_convergence(p_1,p_2,p_3, zoom=3):
     plt.show()
 
 def load_files(time, h, number_of_astroids, extra_name=""):
-    # all_info = np.load(str(extra_name) + "_date_2018-04-27_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".npz")
-    all_info = np.load(str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".npz")
-
-    return all_info
+    astroid_pos = np.loadtxt("astroid_pos_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat")
+    astroid_vel = np.loadtxt("astroid_vel_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat")
+    # all_info = np.load(str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".npz")
+    # return all_info
+    return astroid_pos, astroid_vel
 
 def load_convergence_file(time,h,extra_name=''):
     p_1 = np.loadtxt("p_1_positions_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
@@ -100,20 +114,22 @@ def load_convergence_file(time,h,extra_name=''):
 
 
 '''choose total runtime, time stepsize and number of asteroids'''
-total_years = 500
-timestep = 0.5/365.25
+total_years = 20000
+timestep = 1e-3
+number_of_saves = total_years/timestep/100
 number_of_astroids = 1000
 
-# '''perform the simulation '''
-# jupiter, astroids = fn.simulation(total_years, timestep, number_of_astroids, save=True)
-#
+'''perform the simulation '''
+# fn.simulation(total_years, timestep, number_of_astroids, save=True, number_of_saves=number_of_saves)
+
+# print (number_of_saves)
+
 # ''' load data and plot results'''
-# # all_info = load_files(total_years, timestep, number_of_astroids)
-# # plot(all_info)
-# # plot_histo(all_info, nbins = 100)
+# astroid_pos,astroid_vel = load_files(total_years, timestep, number_of_astroids)
+# plot(astroid_pos)
+# plot_histo(astroid_pos, nbins = 100)
 
-p_1,p_2,p_3 = fn.convergence_test(3, 1e-3,save=False)
-
+# '''convergence test'''
+# p_1,p_2,p_3 = fn.convergence_test(3, 1e-3,save=False)
 # p_1,p_2,p_3 = load_convergence_file(1e-1,1e-3)
-
 # plot_convergence(p_1,p_2,p_3)
