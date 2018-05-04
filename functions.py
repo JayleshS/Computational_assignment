@@ -14,8 +14,9 @@ c3= '#8da0cb'
 def simulation(time, h, number_of_astroids, save=False, extra_name="", number_of_saves=10000):
     '''This function uses the Euler-Cromer method to solve N times 3-body problems.'''
 
-    astroids_pos = open("astroid_pos_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
-    astroids_vel = open("astroid_vel_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
+    '''create files for asteroids position, velocities and remaining asteroids at timestep i'''
+    #astroids_pos = open("astroid_pos_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
+    #astroids_vel = open("astroid_vel_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
     number_left = open("number_of_astroids_left_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat", "a")
 
 
@@ -43,12 +44,18 @@ def simulation(time, h, number_of_astroids, save=False, extra_name="", number_of
     astroids[:,0][:,2] = 1/100*radius0*np.sin(theta0)
 
 
-    '''vx and vy are random '''
-    astroids[:,1][:,0] = + radius0 * np.sin(theta0)
+    '''vx'''
+    astroids[:,1][:,0] = - radius0 * np.sin(theta0)
 
-    astroids[:,1][:,1] = - radius0 * np.cos(theta0)
+    '''vy'''
+    astroids[:,1][:,1] = + radius0 * np.cos(theta0)
 
-    '''vz = small'''
+    '''
+    vx = -r*sin(theta) and vy ~ +cos(theta) is counterclockwise motion
+    vx = +r*sin(theta) and vy ~ -cos(theta) is        clockwise motion
+    '''
+
+    '''vz = small and random'''
     astroids[:,1][:,2] = np.random.uniform(-1e-4, 1e-4, (number_of_astroids))
 
     '''%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'''
@@ -98,11 +105,11 @@ def simulation(time, h, number_of_astroids, save=False, extra_name="", number_of
             print("simulation reached time step " + str(t) + " of " + str(n) + ". Year = " + str(t*h) + "With amount of astroids left:" + str(np.sum(bound_astroids)))
 
 
-            np.savetxt(astroids_pos,astroids[:,0], fmt='%1.6e')
-            np.savetxt(astroids_vel,astroids[:,0], fmt='%1.6e')
-    # if save:
-    #     np.savez(str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids),\
-    #      a_pos=astroids[:,0], a_vel=astroids[:,1], j_pos=jupiter[:,0], j_vel=jupiter[:,1], d_astroid=d_sun_ast)
+            #np.savetxt(astroids_pos,astroids[:,0], fmt='%1.6e')
+            #np.savetxt(astroids_vel,astroids[:,0], fmt='%1.6e')
+    if save:
+        np.savez(str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids),\
+         a_pos=astroids[:,0], a_vel=astroids[:,1], j_pos=jupiter[:,0], j_vel=jupiter[:,1], d_astroid=d_sun_ast)
 
     '''Print the amount of astriods left and the number in a seperate file.'''
     print ("astroids left", np.sum(bound_astroids))

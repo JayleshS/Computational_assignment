@@ -37,8 +37,8 @@ def plot(all_info, zoom = 6, save=''):
         axes.scatter((all_info['a_pos'][:,0]), (all_info['a_pos'][:,1]), s=5, label="Astroids", c=c1)
 
     else:
-        plt.scatter((all_info[:,0]), (all_info[:,1]), label="astroids",c=c1)
-        plt.scatter((all_info[:,0][-300*100:]), (all_info[:,1][-300*100:]), label="Last year of Astroids",c=c2)
+        #plt.scatter((all_info[:,0])           , (all_info[:,1])           , label="astroids"             , c=c1, s=5)
+        plt.scatter((all_info[:,0][-300*100:]), (all_info[:,1][-300*100:]), label="Last year of Astroids", c=c2, s=5)
 
 
     axes.set_xlabel("x$_{position}$ [AU]", fontsize=20)
@@ -99,11 +99,11 @@ def plot_convergence(p_1,p_2,p_3, zoom=3):
     plt.show()
 
 def load_files(time, h, number_of_astroids, extra_name=""):
-    astroid_pos = np.loadtxt("astroid_pos_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat")
-    astroid_vel = np.loadtxt("astroid_vel_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat")
-    # all_info = np.load(str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".npz")
-    # return all_info
-    return astroid_pos, astroid_vel
+    #astroid_pos = np.loadtxt("astroid_pos_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat")
+    #astroid_vel = np.loadtxt("astroid_vel_"+str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".dat")
+    all_info = np.load(str(extra_name) + "_date_" + str(current_date) +  "_all_info_time_" +str(time)+"_h_"+str(h)+"_n_"+str(number_of_astroids)+".npz")
+    return all_info
+    #return astroid_pos, astroid_vel
 
 def load_convergence_file(time,h,extra_name=''):
     p_1 = np.loadtxt("p_1_positions_"+str(extra_name)+"_date_"+str(current_date)+"_convergence_time_"+str(time)+"_h_"+str(h)+".dat", "a")
@@ -114,20 +114,21 @@ def load_convergence_file(time,h,extra_name=''):
 
 
 '''choose total runtime, time stepsize and number of asteroids'''
-total_years = 20000
+total_years = 25
 timestep = 1e-3
 number_of_saves = total_years/timestep/100
 number_of_astroids = 1000
 
 '''perform the simulation '''
-# fn.simulation(total_years, timestep, number_of_astroids, save=True, number_of_saves=number_of_saves)
+fn.simulation(total_years, timestep, number_of_astroids, save=True, number_of_saves=number_of_saves)
 
 # print (number_of_saves)
 
-# ''' load data and plot results'''
-# astroid_pos,astroid_vel = load_files(total_years, timestep, number_of_astroids)
-# plot(astroid_pos)
-# plot_histo(astroid_pos, nbins = 100)
+
+''' load data and plot results'''
+astroid_pos = load_files(total_years, timestep, number_of_astroids)
+plot(astroid_pos, save='np')
+plot_histo(astroid_pos, save='np', nbins = 100)
 
 # '''convergence test'''
 # p_1,p_2,p_3 = fn.convergence_test(3, 1e-3,save=False)
